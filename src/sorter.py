@@ -1,17 +1,19 @@
 import tkinter as tk
 import random
+import time
 from base64 import b16encode
 from functools import partial
 
 WIN_X, WIN_Y = 800, 500
 ARR_LEN = 500
+DELAY = 100 #ms
 
 def main():
     createWindow()
 
 def createWindow():
     root = tk.Tk()
-
+    
     canvas = tk.Canvas(root, width=WIN_X, height=WIN_Y)
     canvas.pack()
     canvas.create_rectangle(10, 60, 790, 490, fill ="#b3b3b3", outline = "#878787")
@@ -58,8 +60,13 @@ def start_sort(msg, canvas, ent_elems):
     input = ent_elems.get()
     if input != "":
         ARR_LEN = int(input)
+    
+    arr = list(range(1, ARR_LEN + 1))
+    shuffle(arr)
+    draw_arr(arr, canvas)
 
-    draw_arr(list(range(1, ARR_LEN + 1)), canvas)
+    badSort(arr, canvas)
+    
 
 def draw_arr(arr, canvas):
     canvas.delete("arr_visual")
@@ -75,7 +82,7 @@ def draw_arr(arr, canvas):
 def rgb_color(rgb):
     return(b'#' + b16encode(bytes(rgb)))
 
-def badSort(arr):
+def badSort(arr, canvas):
     for n in range(len(arr)):
         min = n
         for i in range(n + 1, len(arr)):
