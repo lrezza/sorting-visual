@@ -8,6 +8,7 @@ WIN_X, WIN_Y = 800, 500
 ARR_LEN = 500
 DELAY = 100 #ms
 
+
 def main():
     createWindow()
 
@@ -17,7 +18,7 @@ def createWindow():
     canvas = tk.Canvas(root, width=WIN_X, height=WIN_Y)
     canvas.pack()
     canvas.create_rectangle(10, 60, 790, 490, fill ="#b3b3b3", outline = "#878787")
-
+    
     frame = tk.Frame(root, bg = "#9e9e9e")
     frame.place(relx = 0.01, rely = 0.01, relwidth=0.98, relheight=0.1)
     
@@ -47,51 +48,60 @@ def createWindow():
     ent_elems = tk.Entry(frame, width=6)
     ent_elems.grid(row=1, column=9)
 
-    btn1["command"] = partial(start_sort, "Starting algorithm 1", canvas, ent_elems)    
-
-    arr = list(range(1, ARR_LEN + 1))
-    draw_arr(arr, canvas)
-
+    btn1["command"] = partial(start_sort, "Starting algorithm 1", canvas, ent_elems, ent_delay)    
+    nums = list(range(1, ARR_LEN + 1))
+    draw_reset(nums, canvas)
     root.mainloop()
-
-def start_sort(msg, canvas, ent_elems):
-    global ARR_LEN
+    
+def start_sort(msg, canvas, ent_elems, ent_delay):
+    global ARR_LEN, DELAY
     print(msg)
-    input = ent_elems.get()
-    if input != "":
-        ARR_LEN = int(input)
-    
-    arr = list(range(1, ARR_LEN + 1))
-    shuffle(arr)
-    draw_arr(arr, canvas)
+    input_ent_elems = ent_elems.get()
+    input_ent_delay = ent_delay.get()
 
-    badSort(arr, canvas)
-    
+    if input_ent_elems != "":
+        ARR_LEN = int(input_ent_elems)
+    if input_ent_delay != "":
+        DELAY = int(input_ent_delay)
+        
+    nums = list(range(1, ARR_LEN + 1))
+    shuffle(nums)
+    val_pairs = draw_reset(nums, canvas)
 
-def draw_arr(arr, canvas):
-    canvas.delete("arr_visual")
+    selection_sort(val_pairs, canvas)
+    
+def draw_reset(nums, canvas):
+    canvas.delete("visual")
     max_height = 350
-    width = 780/len(arr)
+    width = 780/len(nums)
 
-    for n in range(len(arr)):
-        per = arr[n] / len(arr)
+    for n in range(len(nums)):
+        per = nums[n] / len(nums)
         height = per * max_height
         color = rgb_color((int(230 - 160*per), 50, int(80 + 160 * per)))
-        canvas.create_rectangle(10 + n*width, 490-height, 10 + (n+1)*width, 490, fill=color, outline=color, tag="arr_visual")
+        canvas.create_rectangle(10 + n*width, 490, 10 + (n+1)*width, 490-height, fill=color, outline=color, tag="visual")
 
+    return list(zip(nums, canvas.find_withtag("visual")))
+        
 def rgb_color(rgb):
     return(b'#' + b16encode(bytes(rgb)))
 
-def badSort(arr, canvas):
-    for n in range(len(arr)):
+def swap(i1, i2, val_pairs, canvas):
+    width = 780/len(val_pairs)
+    canvas.move(val_pairs[i1][1], (i2-i1)*width, 0)
+    canvas.move(val_pairs[i2][1], (i1-i2)*width, 0)
+    val_pairs[i1], val_pairs[i2] = val_pairs[i2], val_pairs[i1]
+
+def selection_sort(val_pairs, canvas):
+    for n in range(len(val_pairs)):
         min = n
-        for i in range(n + 1, len(arr)):
-            if arr[i] < arr[min]:
+        for i in range(n + 1, len(val_pairs)):
+            if val_pairs[i][0] < val_pairs[min][0]:
                 min = i
         if min != n:
-            t = arr[n]
-            arr[n] = arr[min]
-            arr[min] = t
+            swap(min, n, val_pairs, canvas)
+            time.sleep(DELAY/1000)
+            canvas.update()
 
 def shuffle(arr):
     arrCopy = arr.copy()
