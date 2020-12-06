@@ -6,8 +6,7 @@ from functools import partial
 
 WIN_X, WIN_Y = 800, 500
 ARR_LEN = 500
-DELAY = 100 #ms
-
+DELAY = 50 #ms
 
 def main():
     createWindow()
@@ -22,9 +21,9 @@ def createWindow():
     frame = tk.Frame(root, bg = "#9e9e9e")
     frame.place(relx = 0.01, rely = 0.01, relwidth=0.98, relheight=0.1)
     
-    btn1 = tk.Button(frame, text="Algorithm 1")
+    btn1 = tk.Button(frame, text="Selection sort")
     btn1.grid(row=0, column=0)
-    btn2 = tk.Button(frame, text="Algorithm 2")
+    btn2 = tk.Button(frame, text="Insertion sort")
     btn2.grid(row=0, column=1)
     btn3 = tk.Button(frame, text="Algorithm 3")
     btn3.grid(row=0, column=2)
@@ -36,26 +35,24 @@ def createWindow():
     btn6.grid(row=0, column=5)
     btn7 = tk.Button(frame, text="Algorithm 7")
     btn7.grid(row=0, column=6)
-    btn8 = tk.Button(frame, text="Algorithm 8")
-    btn8.grid(row=0, column=7)
 
     lbl_delay = tk.Label(frame, text="Delay:")
-    lbl_delay.grid(row=0, column=8)
+    lbl_delay.grid(row=0, column=7)
     ent_delay = tk.Entry(frame, width=6)
-    ent_delay.grid(row=1, column=8)
+    ent_delay.grid(row=1, column=7)
     lbl_elems = tk.Label(frame, text="Elems:")
-    lbl_elems.grid(row=0, column=9)
+    lbl_elems.grid(row=0, column=8)
     ent_elems = tk.Entry(frame, width=6)
-    ent_elems.grid(row=1, column=9)
+    ent_elems.grid(row=1, column=8)
 
-    btn1["command"] = partial(start_sort, "Starting algorithm 1", canvas, ent_elems, ent_delay)    
+    btn1["command"] = partial(start_sort, "selection sort", canvas, ent_elems, ent_delay)
+    btn2["command"] = partial(start_sort, "insertion sort", canvas, ent_elems, ent_delay)       
     nums = list(range(1, ARR_LEN + 1))
     draw_reset(nums, canvas)
     root.mainloop()
     
-def start_sort(msg, canvas, ent_elems, ent_delay):
+def start_sort(sort_name, canvas, ent_elems, ent_delay):
     global ARR_LEN, DELAY
-    print(msg)
     input_ent_elems = ent_elems.get()
     input_ent_delay = ent_delay.get()
 
@@ -68,7 +65,10 @@ def start_sort(msg, canvas, ent_elems, ent_delay):
     shuffle(nums)
     val_pairs = draw_reset(nums, canvas)
 
-    selection_sort(val_pairs, canvas)
+    if sort_name == "selection sort":
+        selection_sort(val_pairs, canvas)
+    if sort_name == "insertion sort":
+        insertion_sort(val_pairs, canvas)
     
 def draw_reset(nums, canvas):
     canvas.delete("visual")
@@ -100,6 +100,15 @@ def selection_sort(val_pairs, canvas):
                 min = i
         if min != n:
             swap(min, n, val_pairs, canvas)
+            time.sleep(DELAY/1000)
+            canvas.update()
+
+def insertion_sort(val_pairs, canvas):  
+    for i in range (1, len(val_pairs)):
+        j = i
+        while j > 0 and val_pairs[j-1][0] > val_pairs[j][0]:
+            swap(j, j-1, val_pairs, canvas)
+            j -= 1
             time.sleep(DELAY/1000)
             canvas.update()
 
